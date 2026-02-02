@@ -10,18 +10,31 @@ if not TOKEN:
 app = Client("tamil-bot", bot_token=TOKEN)
 
 ydl_opts_search = {
-    'quiet': True, 'extract_flat': True, 'playlist_items': '1-15'
+    'quiet': True, 
+    'extract_flat': True, 
+    'playlist_items': '1-15'
 }
 
 ydl_opts_download = {
-    'format': 'bestaudio/best', 'outtmpl': 'song.%(ext)s',
-    'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '320'}],
-    'retries': 5, 'fragment_retries': 5, 'socket_timeout': 20, 'extractor_retries': 3
+    'format': 'bestaudio/best', 
+    'outtmpl': 'song.%(ext)s',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio', 
+        'preferredcodec': 'mp3', 
+        'preferredquality': '320'
+    }],
+    'retries': 5, 
+    'fragment_retries': 5, 
+    'socket_timeout': 20, 
+    'extractor_retries': 3
 }
 
 @app.on_message(filters.command("start"))
 async def start(client, message):
-    await message.reply("🎵 **Tamil MP3 Bot**\n\n`@yourbot leo` → All songs → Click → MP3!")
+    await message.reply(
+        "🎵 **Tamil MP3 Bot**\n\n"
+        "`@yourbot leo` → All songs → Click → MP3!"
+    )
 
 @app.on_inline_query()
 async def inline_search(client, query):
@@ -38,25 +51,30 @@ async def inline_search(client, query):
             for i, entry in enumerate(entries):
                 title = entry.get('title', 'Unknown')[:50]
                 vid = entry.get('id')
-                results.append(InlineQueryResultArticle(
-                    id=str(i), title=title,
-                    thumb_url=f"https://img.youtube.com/vi/{vid}/hqdefault.jpg",
-                    input_message_content=InputTextMessageContent(f"https://youtu.be/{vid}")
-                ))
+                results.append(
+                    InlineQueryResultArticle(
+                        id=str(i), 
+                        title=title,
+                        thumb_url=f"https://img.youtube.com/vi/{vid}/hqdefault.jpg",
+                        input_message_content=InputTextMessageContent(f"https://youtu.be/{vid}")
+                    )
+                )
             await query.answer(results)
-        except: pass
+        except:
+            pass
 
 @app.on_message(filters.text & filters.private)
 async def download(client, message):
     if "youtube.com" in message.text or "youtu.be" in message.text:
-        await message.reply("⏳ MP3...")
+        await message.reply("⏳ Downloading MP3...")
         try:
             with yt_dlp.YoutubeDL(ydl_opts_download) as ydl:
                 ydl.download([message.text])
-            await message.reply_audio("song.mp3", caption="✅ 320kbps")
-            os.remove("song.mp3")
+            await message.reply_audio("song.mp3", caption="✅ 320kbps Tamil MP3!")
+            if os.path.exists("song.mp3"):
+                os.remove("song.mp3")
         except Exception as e:
-            await message.reply(f"❌ {str(e)}")
+            await message.reply(f"❌ Error: {str(e)[:100]}")
 
-print("🚀 Bot starting...")
+print("🚀 Tamil MP3 Bot starting...")
 app.run()
