@@ -26,7 +26,6 @@ async def start(client, message):
 @app.on_inline_query()
 async def inline_search(client, query):
     text = query.query.lower()
-    # Leo playlist - replace with real one later
     playlist = "https://www.youtube.com/playlist?list=PL4qyD_w1ZqEMb4H3sY5gP0l0Kq0kY0kY0"
     
     if "leo" in text:
